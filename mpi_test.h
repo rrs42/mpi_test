@@ -50,4 +50,11 @@ void make_rect(Rect* rect, Point center, RectSize size);
     printf_point(r.lr);  \
     printf("\n");
 
+#define printf_bound(b) printf("%d x %d", b.width, b.height);
+#define printf_workunit(w) \
+    printf("WorkUnit ");   \
+    printf_bound(w.bound); \
+    printf("\n");          \
+    printf_region(w.region);
+
 #endif
