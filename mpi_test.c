@@ -15,6 +15,41 @@
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 
+int escapes(Point p)
+{
+    complex double z0, z;
+
+    z0 = p.x + p.y * I;
+    z = z0;
+
+    int i;
+    for (i = 0; i < 255; i++) {
+        z = z * z;
+        if (cabs(z) >= 2.0) {
+            break;
+        }
+    }
+
+    return i;
+}
+
+void generate_band(WorkUnit band, int rank)
+{
+    Pixel* pixels = malloc(bound_length(band.bound) * sizeof(Pixel));
+
+    for (int y = 0; y < band.bound.height; y++) {
+        for (int x = 0; x < band.bound.width; x++) {
+            Point p = map_coord_to_point(x, y, band);
+
+            if (x == 0) {
+                printf("worker %d: (%f,%f)\n", rank, p.x, p.y);
+            }
+        }
+    }
+
+    free(pixels);
+}
+
 void worker(Local_MPI_Types* types, int rank)
 {
     WorkUnit work;
@@ -24,6 +59,8 @@ void worker(Local_MPI_Types* types, int rank)
 
     printf("Worker %d Recieved work unit:", rank);
     printf_workunit(work);
+
+    generate_band(work, rank);
 
     return;
 }
@@ -60,6 +97,8 @@ void master(Local_MPI_Types* types, int world_size, const Bound img_geometry)
 
     printf("Root node:\n");
     printf_workunit(work);
+
+    generate_band(work, 0);
 
     if (pixels) {
         free(pixels);
@@ -99,8 +138,8 @@ int main(int argc, const char** argv)
 
         struct argparse_option options[] = {
             OPT_HELP(),
-            OPT_INTEGER('w', "width", &img_geometry.width, "image width"),
-            OPT_INTEGER('t', "height", &img_geometry.height, "image height"),
+            OPT_INTEGER('x', "width", &img_geometry.width, "image width"),
+            OPT_INTEGER('y', "height", &img_geometry.height, "image height"),
             OPT_END()
         };
 

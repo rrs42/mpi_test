@@ -66,6 +66,9 @@ int bound_length(Bound size);
 void make_bound(Bound* bound, int width, int height);
 void make_rect(Rect* rect, Point center, RectSize size);
 
+double_t rect_width(Rect r);
+double_t rect_height(Rect r);
+
 Point map_coord_to_point(int x, int y, WorkUnit w);
 
 #define printf_point(p) printf("(%f,%f)", p.x, p.y);

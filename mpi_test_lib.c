@@ -131,17 +131,28 @@ void make_rect(Rect* rect, Point center, RectSize size)
     rect->lr.y = center.y - (size.height / 2.0);
 }
 
+double_t rect_width(Rect r)
+{
+    return r.lr.x - r.ul.x;
+}
+
+double_t rect_height(Rect r)
+{
+    return r.ul.y - r.lr.y;
+}
+
+
 Point map_coord_to_point(int x, int y, WorkUnit w)
 {
     Point p;
 
     RectSize rs;
 
-    rs.width = w.region.lr.x - w.region.ul.x;
-    rs.height = w.region.ul.y - w.region.lr.y;
+    double_t x_offset = (rect_width(w.region) / w.bound.width) * x;
+    double_t y_offset = (rect_height(w.region) / w.bound.height) * y;;
 
-    p.x = rs.width / w.bound.width * x - w.region.ul.y;
-    p.y = rs.height / w.bound.height * y - w.region.ul.x;
+    p.x = w.region.ul.x + x_offset;
+    p.y = w.region.ul.y - y_offset;
 
     return p;
 }
