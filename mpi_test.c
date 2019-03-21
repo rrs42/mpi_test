@@ -26,62 +26,12 @@ typedef struct Local_MPI_Types {
 
 void make_mpi_types(Local_MPI_Types* types)
 {
-    /* Create Point MPI type */
-    int blocklens[10] = { 2 };
-    MPI_Aint displacements[10] = { offsetof(Point, x), offsetof(Point, y) };
-    MPI_Datatype datatypes[10] = { MPI_DOUBLE };
-
-    MPI_Type_create_struct(1, blocklens, displacements, datatypes, &types->point_type);
-    MPI_Type_commit(&types->point_type);
-
-    /* Create Rect MPI type */
-    blocklens[0] = 2;
-    displacements[0] = offsetof(Rect, ul);
-    displacements[1] = offsetof(Rect, lr);
-    datatypes[0] = types->point_type;
-
-    MPI_Type_create_struct(1, blocklens, displacements, datatypes, &types->rect_type);
-    MPI_Type_commit(&types->rect_type);
-
-    /* Create RectSize type */
-    blocklens[1] = 2;
-    displacements[0] = offsetof(RectSize, width);
-    displacements[1] = offsetof(RectSize, height);
-    datatypes[0] = MPI_DOUBLE;
-
-    MPI_Type_create_struct(1, blocklens, displacements, datatypes, &types->rectsize_type);
-    MPI_Type_commit(&types->rectsize_type);
-
-    /* Create Bound type */
-    blocklens[0] = 2;
-    displacements[0] = offsetof(Bound, width);
-    displacements[1] = offsetof(Bound, height);
-    datatypes[0] = MPI_UINT32_T;
-
-    MPI_Type_create_struct(1, blocklens, displacements, datatypes, &types->bound_type);
-
-    /* Create WorkUnit type */
-    blocklens[0] = 1;
-    blocklens[1] = 1;
-    displacements[0] = offsetof(WorkUnit, bound);
-    displacements[1] = offsetof(WorkUnit, region);
-
-    datatypes[0] = types->bound_type;
-    datatypes[1] = types->rect_type;
-
-    MPI_Type_create_struct(2, blocklens, displacements, datatypes, &types->workunit_type);
-    MPI_Type_commit(&types->workunit_type);
-
-    /* Create Pixel type */
-    blocklens[0] = 3;
-    displacements[0] = offsetof(Pixel, red);
-    displacements[1] = offsetof(Pixel, green);
-    displacements[2] = offsetof(Pixel, blue);
-
-    datatypes[0] = MPI_UINT8_T;
-
-    MPI_Type_create_struct(1, blocklens, displacements, datatypes, &types->pixel_type);
-    MPI_Type_commit(&types->pixel_type);
+    make_mpi_type_Pixel(&types->pixel_type);
+    make_mpi_type_Bound(&types->bound_type);
+    make_mpi_type_Point(&types->point_type);
+    make_mpi_type_Rect(&types->rect_type, types->point_type);
+    make_mpi_type_RectSize(&types->rectsize_type);
+    make_mpi_type_WorkUnit(&types->workunit_type, types->bound_type, types->rect_type);
 }
 
 void worker(Local_MPI_Types* types, int rank)
@@ -115,9 +65,9 @@ void master(Local_MPI_Types* types, int world_size, const Bound img_geometry)
         bands[zone].bound.width = img_geometry.width;
         bands[zone].bound.height = (img_geometry.height / zones);
         bands[zone].region.ul.x = r.ul.x;
-        bands[zone].region.ul.y = r.ul.y - ((rsize.height / 4.0) * zone);
+        bands[zone].region.ul.y = r.ul.y - ((rsize.height / zones) * zone);
         bands[zone].region.lr.x = r.lr.x;
-        bands[zone].region.lr.y = r.ul.y - ((rsize.height / 4.0) * ((zone + 1)));
+        bands[zone].region.lr.y = r.ul.y - ((rsize.height / zones) * ((zone + 1)));
     }
 
     for (int i = 0; i < zones; i++) {
