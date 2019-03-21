@@ -15,25 +15,6 @@
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 
-typedef struct Local_MPI_Types {
-    MPI_Datatype pixel_type;
-    MPI_Datatype bound_type;
-    MPI_Datatype point_type;
-    MPI_Datatype rect_type;
-    MPI_Datatype rectsize_type;
-    MPI_Datatype workunit_type;
-} Local_MPI_Types;
-
-void make_mpi_types(Local_MPI_Types* types)
-{
-    make_mpi_type_Pixel(&types->pixel_type);
-    make_mpi_type_Bound(&types->bound_type);
-    make_mpi_type_Point(&types->point_type);
-    make_mpi_type_Rect(&types->rect_type, types->point_type);
-    make_mpi_type_RectSize(&types->rectsize_type);
-    make_mpi_type_WorkUnit(&types->workunit_type, types->bound_type, types->rect_type);
-}
-
 void worker(Local_MPI_Types* types, int rank)
 {
     WorkUnit work;

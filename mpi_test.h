@@ -50,6 +50,17 @@ typedef struct WorkUnit {
 
 void make_mpi_type_WorkUnit(MPI_Datatype* type, MPI_Datatype bound_type, MPI_Datatype rect_type);
 
+typedef struct Local_MPI_Types {
+    MPI_Datatype pixel_type;
+    MPI_Datatype bound_type;
+    MPI_Datatype point_type;
+    MPI_Datatype rect_type;
+    MPI_Datatype rectsize_type;
+    MPI_Datatype workunit_type;
+} Local_MPI_Types;
+
+void make_mpi_types(Local_MPI_Types* types);
+
 int bound_index(int x, int y, Bound size);
 int bound_length(Bound size);
 void make_bound(Bound* bound, int width, int height);
