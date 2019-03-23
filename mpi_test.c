@@ -15,6 +15,34 @@
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 
+void write_image(Pixel* pixels, int width, int height, char* filename)
+{
+    ExceptionInfo exception;
+    char geometry[MaxTextExtent];
+
+    InitializeMagick(NULL);
+
+    ImageInfo* image_info = CloneImageInfo(0);
+    GetExceptionInfo(&exception);
+    Image* image = ConstituteImage(width, height, "RGB", CharPixel, pixels, &exception);
+    if (image == NULL) {
+        CatchException(&exception);
+        DestroyMagick();
+        return;
+    }
+
+    snprintf(geometry, MaxTextExtent, "%dx%d", width, height);
+
+    image_info->size = geometry;
+    strncpy(image->filename, filename, MaxTextExtent);
+    if (!WriteImage(image_info, image)) {
+        CatchException(&exception);
+        DestroyImage(image);
+        DestroyMagick();
+        return;
+    }
+}
+
 int escapes(Point p)
 {
     complex double z0, z;
@@ -24,7 +52,7 @@ int escapes(Point p)
 
     int i;
     for (i = 0; i < 255; i++) {
-        z = z * z;
+        z = z * z + z0;
         if (cabs(z) >= 2.0) {
             break;
         }
@@ -33,7 +61,7 @@ int escapes(Point p)
     return i;
 }
 
-void generate_band(WorkUnit band, int rank)
+Pixel* generate_band(WorkUnit band, int rank)
 {
     Pixel* pixels = malloc(bound_length(band.bound) * sizeof(Pixel));
 
@@ -41,13 +69,20 @@ void generate_band(WorkUnit band, int rank)
         for (int x = 0; x < band.bound.width; x++) {
             Point p = map_coord_to_point(x, y, band);
 
-            if (x == 0) {
-                printf("worker %d: (%f,%f)\n", rank, p.x, p.y);
-            }
+            int c = escapes(p);
+            int i = bound_index(x, y, band.bound);
+
+            pixels[i].red = c;
+            pixels[i].green = c;
+            pixels[i].blue = c;
+
+            // if (x == 0) {
+            //     printf("worker %d: (%f,%f) = %d\n", rank, p.x, p.y, c);
+            // }
         }
     }
 
-    free(pixels);
+    return pixels;
 }
 
 void worker(Local_MPI_Types* types, int rank)
@@ -60,8 +95,11 @@ void worker(Local_MPI_Types* types, int rank)
     printf("Worker %d Recieved work unit:", rank);
     printf_workunit(work);
 
-    generate_band(work, rank);
+    Pixel* pixels = generate_band(work, rank);
 
+    MPI_Gather(pixels, bound_length(work.bound), types->pixel_type, NULL, 0, types->pixel_type, 0, MPI_COMM_WORLD);
+
+    free(pixels);
     return;
 }
 
@@ -98,7 +136,16 @@ void master(Local_MPI_Types* types, int world_size, const Bound img_geometry)
     printf("Root node:\n");
     printf_workunit(work);
 
-    generate_band(work, 0);
+    Pixel* band_pixels = generate_band(work, 0);
+
+    MPI_Gather(band_pixels, bound_length(work.bound), types->pixel_type,
+        pixels, bound_length(work.bound), types->pixel_type, 0, MPI_COMM_WORLD);
+
+    write_image(pixels, img_geometry.width, img_geometry.height, "test.png");
+
+    if (band_pixels) {
+        free(band_pixels);
+    }
 
     if (pixels) {
         free(pixels);
