@@ -64,6 +64,7 @@ int escapes(Point p)
 Pixel* generate_band(WorkUnit band, int rank)
 {
     Pixel* pixels = malloc(bound_length(band.bound) * sizeof(Pixel));
+    printf("Worker %d: allocated %zu bytes", rank, bound_length(band.bound) * sizeof(Pixel));
 
     for (int y = 0; y < band.bound.height; y++) {
         for (int x = 0; x < band.bound.width; x++) {
@@ -92,8 +93,11 @@ void worker(Local_MPI_Types* types, int rank)
     printf_workunit(work);
 
     Pixel* pixels = generate_band(work, rank);
+    printf("Worker %d:Done generating band\n", rank);
 
-    MPI_Gather(pixels, bound_length(work.bound), types->pixel_type, NULL, 0, types->pixel_type, 0, MPI_COMM_WORLD);
+    MPI_Gather(pixels, bound_length(work.bound), types->pixel_type, NULL, bound_length(work.bound), types->pixel_type, 0, MPI_COMM_WORLD);
+
+    printf("Worker %d: results sent\n", rank);
 
     free(pixels);
     return;
@@ -133,9 +137,12 @@ void master(Local_MPI_Types* types, int world_size, const Bound img_geometry)
     printf_workunit(work);
 
     Pixel* band_pixels = generate_band(work, 0);
+    printf("Worker %d:Done generating band\n", 0);
 
     MPI_Gather(band_pixels, bound_length(work.bound), types->pixel_type,
         pixels, bound_length(work.bound), types->pixel_type, 0, MPI_COMM_WORLD);
+
+    printf("Worker %d: results sent\n", 0);
 
     write_image(pixels, img_geometry.width, img_geometry.height, "test.png");
 
@@ -174,7 +181,6 @@ int main(int argc, const char** argv)
 
     if (rank != 0) {
         worker(&types, rank);
-        MPI_Finalize();
     } else {
         // master
         Bound img_geometry;
@@ -197,8 +203,8 @@ int main(int argc, const char** argv)
         printf("selected width, height = %d, %d\n", img_geometry.width, img_geometry.height);
 
         master(&types, size, img_geometry);
-        MPI_Finalize();
     }
 
+    MPI_Finalize();
     return 0;
 }
