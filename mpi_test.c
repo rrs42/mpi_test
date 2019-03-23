@@ -75,10 +75,6 @@ Pixel* generate_band(WorkUnit band, int rank)
             pixels[i].red = c;
             pixels[i].green = c;
             pixels[i].blue = c;
-
-            // if (x == 0) {
-            //     printf("worker %d: (%f,%f) = %d\n", rank, p.x, p.y, c);
-            // }
         }
     }
 
@@ -111,8 +107,8 @@ void master(Local_MPI_Types* types, int world_size, const Bound img_geometry)
     Pixel* pixels = malloc(bound_length(img_geometry) * sizeof(Pixel));
     Rect r;
 
-    Point origin = { 0.0, 0.0 };
-    RectSize rsize = { 2.0, 2.0 };
+    Point origin = { -0.5, 0.0 };
+    RectSize rsize = { 2.5, 2.5 };
 
     make_rect(&r, origin, rsize);
 
@@ -157,7 +153,7 @@ void master(Local_MPI_Types* types, int world_size, const Bound img_geometry)
 }
 
 static const char* usage[] = {
-    "mpi_test [-w <width>] [-t <height>]",
+    "mpi_test [-x <width>] [-y <height>]",
     NULL
 };
 
