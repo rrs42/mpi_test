@@ -64,7 +64,7 @@ int escapes(Point p)
 Pixel* generate_band(WorkUnit band, int rank)
 {
     Pixel* pixels = malloc(bound_length(band.bound) * sizeof(Pixel));
-    printf("Worker %d: allocated %zu bytes", rank, bound_length(band.bound) * sizeof(Pixel));
+    printf("Worker %d: allocated %zu bytes\n", rank, bound_length(band.bound) * sizeof(Pixel));
 
     for (int y = 0; y < band.bound.height; y++) {
         for (int x = 0; x < band.bound.width; x++) {
