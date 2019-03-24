@@ -12,6 +12,11 @@ add_library(argparse argparse.c)
 
 add_executable(mpi_test mpi_test.c mpi_test_lib.c)
 target_link_libraries(mpi_test LINK_PUBLIC argparse)
+
+if(NOT APPLE)
+    target_link_libraries(mpi_test LINK_PUBLIC m)
+endif()
+
 target_include_directories(mpi_test PUBLIC ${GM_INCLUDE_DIRS})
-target_link_libraries(mpi_test ${GM_LIBRARIES})
+target_link_libraries(mpi_test LINK_PUBLIC ${GM_LIBRARIES})
 target_link_directories(mpi_test PUBLIC ${GM_LIBRARY_DIRS})
