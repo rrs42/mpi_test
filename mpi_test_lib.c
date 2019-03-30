@@ -243,7 +243,6 @@ double_t rect_height(Rect r)
     return r.ul.y - r.lr.y;
 }
 
-
 Point map_coord_to_point(int x, int y, WorkUnit w)
 {
     Point p;
@@ -251,7 +250,7 @@ Point map_coord_to_point(int x, int y, WorkUnit w)
     RectSize rs;
 
     double_t x_offset = (rect_width(w.region) / w.bound.width) * x;
-    double_t y_offset = (rect_height(w.region) / w.bound.height) * y;;
+    double_t y_offset = (rect_height(w.region) / w.bound.height) * y;
 
     p.x = w.region.ul.x + x_offset;
     p.y = w.region.ul.y - y_offset;
