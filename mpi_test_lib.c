@@ -1,5 +1,6 @@
 #include "mpi_test.h"
 #include <assert.h>
+#include <float.h>
 
 void make_mpi_type_Pixel(MPI_Datatype* type)
 {
@@ -15,6 +16,107 @@ void make_mpi_type_Pixel(MPI_Datatype* type)
 
     MPI_Type_create_struct(1, blocklengths, displacements, datatypes, type);
     MPI_Type_commit(type);
+}
+
+Pixel_HSV rgb2hsv(Pixel pixel)
+{
+    double_t h, s, v;
+    double_t r_prime, g_prime, b_prime, c_max, c_min, delta;
+    r_prime = (double_t)pixel.red / UINT8_MAX;
+    g_prime = (double_t)pixel.green / UINT8_MAX;
+    b_prime = (double_t)pixel.blue / UINT8_MAX;
+
+    c_max = r_prime > g_prime ? r_prime : g_prime;
+    c_max = c_max > b_prime ? c_max : b_prime;
+    c_min = r_prime < g_prime ? r_prime : g_prime;
+    c_min = c_min < b_prime ? c_min : b_prime;
+
+    delta = c_max - c_min;
+
+    if (delta == 0.0) {
+        h = 0.0;
+    } else if (r_prime >= c_max) {
+        h = (g_prime - b_prime) / delta;
+    } else if (g_prime >= c_max) {
+        h = 2 + (b_prime - r_prime) / delta;
+    } else {
+        h = 4 + (r_prime - g_prime) / delta;
+    }
+    h *= 60.0;
+    if (h < 0.0) {
+        h += 360.0;
+    }
+
+    if (c_max <= 0.0) {
+        s = 0.0;
+    } else {
+        s = delta / c_max;
+    }
+
+    v = c_max;
+
+    Pixel_HSV result = {
+        h,
+        s,
+        v
+    };
+
+    return result;
+}
+
+Pixel hsv2rgb(Pixel_HSV pixel)
+{
+    double_t C = pixel.v * pixel.s;
+    double_t H_prime = pixel.h;
+    if (H_prime >= 360.0)
+        H_prime = 0.0;
+    H_prime /= 60.0;
+    int i = (int)trunc(H_prime);
+
+    double_t X = C * (1.0 - fabs(fmod(H_prime, 2) - 1.0));
+    double_t m = pixel.v - C;
+
+    double r_prime, g_prime, b_prime;
+    switch (i) {
+    case 0:
+        r_prime = C;
+        g_prime = X;
+        b_prime = 0;
+        break;
+    case 1:
+        r_prime = X;
+        g_prime = C;
+        b_prime = 0;
+        break;
+    case 2:
+        r_prime = 0;
+        g_prime = C;
+        b_prime = X;
+        break;
+    case 3:
+        r_prime = 0;
+        g_prime = X;
+        b_prime = C;
+        break;
+    case 4:
+        r_prime = X;
+        g_prime = 0;
+        b_prime = C;
+        break;
+    case 5:
+        r_prime = C;
+        g_prime = 0;
+        b_prime = X;
+        break;
+    }
+
+    Pixel result = {
+        round((r_prime + m) * UINT8_MAX),
+        round((g_prime + m) * UINT8_MAX),
+        round((b_prime + m) * UINT8_MAX)
+    };
+
+    return result;
 }
 
 void make_mpi_type_Bound(MPI_Datatype* type)

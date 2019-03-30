@@ -168,6 +168,14 @@ int main(int argc, const char** argv)
 {
     int rank, size;
 
+    Pixel p = { 0x1a, 0x2b, 0x3c };
+    Pixel_HSV p_1 = rgb2hsv(p);
+    Pixel p_2 = hsv2rgb(p_1);
+
+    printf("(RGB) %X, %X, %X\n", p.red, p.green, p.blue);
+    printf("(HSV) %f, %f, %f\n", p_1.h, p_1.s, p_1.v);
+    printf("(RGB) %X, %X, %X\n", p_2.red, p_2.green, p_2.blue);
+
     if (MPI_Init(NULL, NULL) != MPI_SUCCESS) {
         printf("Unable to init MPI\n");
         return -1;

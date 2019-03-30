@@ -15,6 +15,15 @@ typedef struct Pixel {
 
 void make_mpi_type_Pixel(MPI_Datatype* type);
 
+typedef struct Pixel_HSV {
+    double_t h;
+    double_t s;
+    double_t v;
+} Pixel_HSV;
+
+Pixel_HSV rgb2hsv(Pixel pixel);
+Pixel hsv2rgb(Pixel_HSV pixel);
+
 typedef struct Bound {
     uint32_t width;
     uint32_t height;
