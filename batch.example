@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -l select=8:mpiprocs=2
+#PBS -v IMGWIDTH,IMGHEIGHT
+
+IMGWIDTH=${IMGWIDTH:-1024}
+IMGHEIGHT=${IMGHEIGHT:-768}
+
+cd $PBS_O_WORKDIR
+
+mpirun ./mpi_test -x $IMGWIDTH -y $IMGHEIGHT
