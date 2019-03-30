@@ -21,5 +21,3 @@ target_link_libraries(mpi_test LINK_PUBLIC argparse)
 target_link_libraries(mpi_test LINK_PUBLIC ${MPI_LIBS})
 target_link_libraries(mpi_test LINK_PUBLIC ${GRMG_LIBS})
 target_link_libraries(mpi_test LINK_PUBLIC m)
-
-#target_link_directories(mpi_test PUBLIC ${GM_LIBRARY_DIRS})
