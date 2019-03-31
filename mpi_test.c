@@ -15,7 +15,7 @@
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 
-void write_image(Pixel* pixels, int width, int height, char* filename)
+void write_image(Pixel* pixels, int width, int height, const char* filename)
 {
     ExceptionInfo exception;
     char geometry[MaxTextExtent];
@@ -103,7 +103,7 @@ void worker(Local_MPI_Types* types, int rank)
     return;
 }
 
-void master(Local_MPI_Types* types, int world_size, const Bound img_geometry)
+void master(Local_MPI_Types* types, int world_size, const Bound img_geometry, const char* file_name)
 {
     int zones = world_size;
 
@@ -144,7 +144,7 @@ void master(Local_MPI_Types* types, int world_size, const Bound img_geometry)
 
     printf("Worker %d: results sent\n", 0);
 
-    write_image(pixels, img_geometry.width, img_geometry.height, "test.png");
+    write_image(pixels, img_geometry.width, img_geometry.height, file_name);
 
     if (band_pixels) {
         free(band_pixels);
@@ -167,6 +167,7 @@ static const char* usage[] = {
 int main(int argc, const char** argv)
 {
     int rank, size;
+    const char* file_name = NULL;
 
     Pixel p = { 0x1a, 0x2b, 0x3c };
     Pixel_HSV p_1 = rgb2hsv(p);
@@ -191,26 +192,35 @@ int main(int argc, const char** argv)
         worker(&types, rank);
     } else {
         // master
-        Bound img_geometry;
+        int width = WIDTH, height = HEIGHT;
 
         struct argparse_option options[] = {
             OPT_HELP(),
-            OPT_INTEGER('x', "width", &img_geometry.width, "image width"),
-            OPT_INTEGER('y', "height", &img_geometry.height, "image height"),
+            OPT_INTEGER('x', "width", &width, "image width"),
+            OPT_INTEGER('y', "height", &height, "image height"),
+            OPT_STRING('o', "output", &file_name, "output file name"),
             OPT_END()
         };
-
-        if (img_geometry.width == 0)
-            img_geometry.width = WIDTH;
-        if (img_geometry.height == 0)
-            img_geometry.height = HEIGHT;
 
         struct argparse argparse;
         argparse_init(&argparse, options, usage, 0);
         argc = argparse_parse(&argparse, argc, argv);
-        printf("selected width, height = %d, %d\n", img_geometry.width, img_geometry.height);
+        printf("selected width, height = %d, %d\n", width, height);
 
-        master(&types, size, img_geometry);
+        if (width == 0)
+            width = WIDTH;
+        if (height == 0)
+            height = HEIGHT;
+
+        if (file_name == NULL) {
+            file_name = "test_image.png";
+        }
+
+        Bound img_geometry = { width, height };
+
+        printf("output: %s  (%d x %d)\n", file_name, width, height);
+
+        master(&types, size, img_geometry, file_name);
     }
 
     MPI_Finalize();
