@@ -29,14 +29,14 @@ fi
 mkdir build
 
 CMAKE_OPTIONS="-DCMAKE_BUILD_TYPE=${build_type}"
-#CMAKE_OPTIONS="-DCMAKE_BUILD_TYPE=Release"
 
-cmake ${CMAKE_OPTIONS} . -B build
+CMAKE=$(which cmake cmake3)
+
 (
 	cd build
-	cmake ${CMAKE_OPTIONS} ..
+	$CMAKE ${CMAKE_OPTIONS} ..
 )
 (
 	cd build
-	cmake --build .
+	$CMAKE --build .
 )
