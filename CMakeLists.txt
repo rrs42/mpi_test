@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.10)
 
 project (mpi_test C)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules")
@@ -8,7 +8,7 @@ set (CMAKE_C_STANDARD 99)
 include_directories(${PROJECT_SOURCE_DIR})
 
 find_package(MPI REQUIRED)
-find_package(GraphicsMagick)
+find_package(GraphicsMagick REQUIRED)
 
 add_library(argparse argparse.c)
 
