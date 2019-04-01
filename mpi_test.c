@@ -169,6 +169,10 @@ int main(int argc, const char** argv)
     int rank, size;
     const char* file_name = NULL;
 
+#ifdef USE_HDF5
+    printf("Using HDF5\n");
+#endif
+
     Pixel p = { 0x1a, 0x2b, 0x3c };
     Pixel_HSV p_1 = rgb2hsv(p);
     Pixel p_2 = hsv2rgb(p_1);
@@ -207,9 +211,9 @@ int main(int argc, const char** argv)
         argc = argparse_parse(&argparse, argc, argv);
         printf("selected width, height = %d, %d\n", width, height);
 
-        if (width == 0)
+        if (width <= 0)
             width = WIDTH;
-        if (height == 0)
+        if (height <= 0)
             height = HEIGHT;
 
         if (file_name == NULL) {

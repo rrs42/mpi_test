@@ -9,10 +9,14 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 find_package(MPI REQUIRED)
 find_package(GraphicsMagick REQUIRED)
+find_package(HDF5)
+
+message(${HDF5_IS_PARALLEL})
 
 add_library(argparse argparse.c)
 
 add_executable(mpi_test mpi_test.c mpi_test_lib.c)
+target_compile_definitions(mpi_test PRIVATE USE_HDF5)
 target_include_directories(mpi_test PUBLIC ${MAGICK_INCLUDE_DIR})
 target_include_directories(mpi_test PUBLIC ${MPI_C_HEADER_DIR})
 target_link_libraries(mpi_test LINK_PUBLIC argparse)
