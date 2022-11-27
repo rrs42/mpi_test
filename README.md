@@ -5,11 +5,16 @@ Generates a (currently monochrome) Mandelbrot set image using MPI to
 distribute the work.
 
 Tested with:
-* clang, OpenMPI on Mac OS
-* gcc, OpenMPI on Linux (RHEL 8)
-* Intel oneAPI, Intel MPI on Linux (RHEL 8)
+- clang, OpenMPI4 on Mac OS
+- gcc, OpenMPI4 on Linux (RHEL 8)
+- Intel oneAPI, Intel MPI (2022) on Linux (RHEL 8)
 
 When run without mpirun it will generate the image with a single thread.
+
+Requires:
+- CMake
+- An MPI Library (e.g. OpenMPI or IntelMPI)
+- GraphicsMagick library (The code should work with ImageMagick but would require a bit of CMake tweaking)
 
 Work is distributed by banding the image horizontally based on the number
 of workers. Will probably fail if the number of mpithreads is greater than
