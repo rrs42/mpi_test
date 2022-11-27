@@ -15,6 +15,10 @@ while getopts "cdr" OPTION; do
 	r)
 		build_type="Release"
 		;;
+	*)
+		echo "Invalid flag"
+		exit
+		;;
 	esac
 done
 
@@ -33,10 +37,10 @@ CMAKE_OPTIONS="-DCMAKE_BUILD_TYPE=${build_type}"
 CMAKE=$(which cmake cmake3)
 
 (
-	cd build
+	cd build || exit
 	$CMAKE ${CMAKE_OPTIONS} ..
 )
 (
-	cd build
+	cd build || exit
 	$CMAKE --build .
 )
