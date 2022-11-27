@@ -34,7 +34,8 @@ mkdir build
 
 CMAKE_OPTIONS="-DCMAKE_BUILD_TYPE=${build_type}"
 
-CMAKE=$(which cmake cmake3)
+# select first cmake in path
+CMAKE=$(which cmake cmake3 | head -1)
 
 (
 	cd build || exit
