@@ -178,7 +178,7 @@ int main(int argc, const char** argv)
     Pixel p_2 = hsv2rgb(p_1);
 
     printf("(RGB) %X, %X, %X\n", p.red, p.green, p.blue);
-    printf("(HSV) %f, %f, %f\n", p_1.h, p_1.s, p_1.v);
+    printf("(HSV) %Lf, %Lf, %Lf\n", (long double)p_1.h, (long double)p_1.s, (long double)p_1.v);
     printf("(RGB) %X, %X, %X\n", p_2.red, p_2.green, p_2.blue);
 
     if (MPI_Init(NULL, NULL) != MPI_SUCCESS) {

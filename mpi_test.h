@@ -2,6 +2,7 @@
 #define _MPI_TEST_H_
 
 #include <math.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -80,7 +81,7 @@ double_t rect_height(Rect r);
 
 Point map_coord_to_point(int x, int y, WorkUnit w);
 
-#define printf_point(p) printf("(%f,%f)", p.x, p.y);
+#define printf_point(p) printf("(%Lf,%Lf)", (long double) p.x, (long double) p.y);
 #define printf_region(r) \
     printf("Region :");  \
     printf_point(r.ul);  \
