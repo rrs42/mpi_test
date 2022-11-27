@@ -5,6 +5,6 @@
 IMGWIDTH=${IMGWIDTH:-1024}
 IMGHEIGHT=${IMGHEIGHT:-768}
 
-cd $PBS_O_WORKDIR
+cd "$PBS_O_WORKDIR" || exit
 
-mpirun ./mpi_test -x $IMGWIDTH -y $IMGHEIGHT
+mpirun ./mpi_test -x "$IMGWIDTH" -y "$IMGHEIGHT"
