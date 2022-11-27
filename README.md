@@ -12,7 +12,7 @@ Tested with:
 When run without mpirun it will generate the image with a single thread.
 
 Requires:
-- CMake
+- CMake3
 - An MPI Library (e.g. OpenMPI or IntelMPI)
 - GraphicsMagick library (The code should work with ImageMagick but would require a bit of CMake tweaking)
 
@@ -28,3 +28,14 @@ Program arguments:
 
  -y [height]     Image height (default 768)
 
+Build Instructions:
+The build.sh script will create a CMake build directory called 'build' and will build the executable there. The build
+script takes a few arguments:
+
+ -c    Cleanup without building
+ 
+ -d    Build with debug info
+ 
+ -r    Build with release settings
+ 
+ 
